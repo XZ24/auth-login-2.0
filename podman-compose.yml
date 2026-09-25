@@ -1,0 +1,16 @@
+version: "3"
+services:
+  ui:
+    image: localhost/${IMAGE_NAME}:latest
+    container_name: ${CONTAINER_NAME}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_LOGIN_USERNAME: ${VITE_LOGIN_USERNAME:-admin}
+        VITE_LOGIN_PASSWORD: ${VITE_LOGIN_PASSWORD:-admin123}
+        VITE_BASE_PATH: ${VITE_BASE_PATH}
+    ports:
+      - "${PORT:-8072}:8080"
+    restart: unless-stopped
