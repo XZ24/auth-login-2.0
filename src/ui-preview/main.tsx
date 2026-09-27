@@ -8,6 +8,7 @@ import './preview.css'
 import { PreviewShell } from './PreviewShell'
 import { WorkspacePage } from './WorkspacePage'
 import { WorkbasketPage } from './WorkbasketPage'
+import { PreviewAuthGate, PreviewLogin } from './auth/Account'
 import { ClaimsPage } from './ClaimsPage'
 
 const routes: Record<string, string> = {
@@ -21,7 +22,7 @@ const page = routes[path]
 
 ReactDOM.createRoot(document.getElementById('preview-root')!).render(
   <React.StrictMode>
-    <PreviewShell page={page || 'Page not found'}>
+    {path === '/ui-preview/login' ? <PreviewLogin /> : <PreviewAuthGate><PreviewShell page={page || 'Page not found'}>
       {page === 'Workbasket' ? <WorkbasketPage /> : page === 'Claims' ? <ClaimsPage /> : page === 'Claim workspace' ? <WorkspacePage /> : (
         <div className="pv-page-heading">
           <h1>Page not found</h1>
@@ -29,6 +30,6 @@ ReactDOM.createRoot(document.getElementById('preview-root')!).render(
           <a href="/ui-preview/workbasket">Return to Workbasket preview</a>
         </div>
       )}
-    </PreviewShell>
+    </PreviewShell></PreviewAuthGate>}
   </React.StrictMode>,
 )

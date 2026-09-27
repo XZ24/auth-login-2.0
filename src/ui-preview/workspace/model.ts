@@ -120,6 +120,12 @@ export function workspaceContext() {
       } catch { /* Invalid return links fall back to the Claims registry. */ }
     }
   }
+  if (origin === 'workbasket' && params.get('returnTo')) {
+    try {
+      const target = new URL(params.get('returnTo')!, window.location.origin)
+      if (target.origin === window.location.origin && target.pathname === '/ui-preview/workbasket') back = target.pathname + target.search
+    } catch { /* Invalid return links fall back to the Workbasket queue. */ }
+  }
   const label = origin === 'claims' ? params.get('view') || 'Claims results' : queue === 'all' ? 'All Workbasket queues' : queues.find(item => item.id === queue)!.label
   const href = (target: number) => {
     const next = new URLSearchParams(params)

@@ -76,10 +76,11 @@ export function activityAge(claim: WorkbasketClaim) {
   const hours = Math.round((clock - new Date(claim.activityAt).getTime()) / 3_600_000)
   return hours >= 24 ? `${Math.floor(hours / 24)}d ago` : `${hours}h ago`
 }
-export function workspaceUrl(claim: WorkbasketClaim, queue: WorkbasketFilter, search: string, ordered: WorkbasketClaim[]) {
+export function workspaceUrl(claim: WorkbasketClaim, queue: WorkbasketFilter, search: string, ordered: WorkbasketClaim[], returnTo?: string) {
   const params = new URLSearchParams({ claim: claim.claimNo, queue, from: 'workbasket', q: search,
     position: String(ordered.findIndex(item => item.claimNo === claim.claimNo) + 1),
     total: String(ordered.length), order: ordered.map(item => item.claimNo).join(','), asOf: WORKBASKET_AS_OF })
+  if (returnTo) params.set('returnTo', returnTo)
   return `/ui-preview/workspace?${params}`
 }
 

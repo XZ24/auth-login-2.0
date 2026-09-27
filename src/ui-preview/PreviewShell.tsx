@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ArrowSquareOut, ChartBar, CaretDown, CaretRight, Check, Circle, ClockCountdown, FileText, FolderSimple, MagnifyingGlass, SidebarSimple, SquaresFour, Tray, X } from '@phosphor-icons/react'
+import { Key, SignOut, ArrowSquareOut, ChartBar, CaretDown, CaretRight, Check, Circle, ClockCountdown, FileText, FolderSimple, MagnifyingGlass, SidebarSimple, SquaresFour, Tray, X } from '@phosphor-icons/react'
 import { Badge, Button, Input, PageContainer, PreviewIcon } from './components/primitives'
+
+import { ChangePassword } from './auth/Account'
+import { signOut } from './auth/session'
 
 const destinations = [
   { label: 'Workbasket', icon: SquaresFour, href: '/ui-preview/workbasket', description: 'Choose your next claim' },
@@ -18,6 +21,10 @@ export function PreviewShell({ page, children }: { page: string; children: React
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
+  const [passwordOpen, setPasswordOpen] = useState(false)
+  const [accountNotice, setAccountNotice] = useState('')
+  const [accountError, setAccountError] = useState('')
+  const closePassword = () => { setPasswordOpen(false); profileRef.current?.querySelector('button')?.focus() }
   const [profileOpen, setProfileOpen] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
@@ -57,6 +64,8 @@ export function PreviewShell({ page, children }: { page: string; children: React
   }, [sidebarOpen])
 
   return <div className="ui-preview">
+    {passwordOpen && <ChangePassword close={closePassword} success={() => { closePassword(); setAccountNotice('Password updated successfully.') }} />}
+    {accountNotice && <div className="pa-toast" role="status"><PreviewIcon icon={Check} />{accountNotice}<Button variant="ghost" aria-label="Dismiss password update notification" onClick={() => setAccountNotice('')}><PreviewIcon icon={X} /></Button></div>}
     <a className="pv-skip" href="#preview-content">Skip to content</a>
     {sidebarOpen && <button className="pv-backdrop" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} />}
     <aside ref={sidebarRef} id="preview-navigation" className={`pv-sidebar ${sidebarOpen ? 'is-open' : ''}`} aria-label="Application navigation"
@@ -92,8 +101,8 @@ export function PreviewShell({ page, children }: { page: string; children: React
           <div className="pv-search-field"><PreviewIcon icon={MagnifyingGlass} /><Input ref={searchRef} type="search" aria-label="Global search" placeholder="Search claims, policies, customers…" value={query} aria-expanded={searchOpen} aria-controls="preview-search-results" onFocus={() => setSearchOpen(true)} onChange={event => { setQuery(event.target.value); setSearchOpen(true) }} /><kbd>⌘ K</kbd></div>
           {searchOpen && <div className="pv-search-results" id="preview-search-results"><p className="pv-eyebrow">PREVIEW NAVIGATION</p><p className="pv-search-hint">Claim search will be connected in the next stage.</p>{matches.map(item => <a key={item.href} href={item.href}><PreviewIcon icon={item.icon} /><span>{item.label}<small>{item.description}</small></span><PreviewIcon icon={ArrowSquareOut} /></a>)}{!matches.length && <p role="status" className="pv-search-hint">No preview pages match “{query}”.</p>}</div>}
         </div>
-        <div className="pv-header-end"><Badge tone="accent">Preview</Badge><div ref={profileRef} className="pv-profile-wrap"><button className="pv-profile" aria-label="Nurul Aisyah, profile" aria-expanded={profileOpen} aria-controls="preview-profile" onClick={() => setProfileOpen(!profileOpen)}><span className="pv-avatar">NA</span><span className="pv-profile-name">Nurul Aisyah<small>Claims assessor</small></span><PreviewIcon icon={CaretDown} /></button>
-          {profileOpen && <section id="preview-profile" className="pv-profile-popover" aria-label="Preview profile"><span className="pv-eyebrow">PREVIEW PROFILE</span><h3>Nurul Aisyah</h3><p>Claims assessor · Malaysia</p><div><PreviewIcon icon={Check} /><span>Local demonstration profile</span></div><p className="pv-caption">Account settings are outside this shell preview.</p><Button variant="ghost" onClick={() => { setProfileOpen(false); profileRef.current?.querySelector('button')?.focus() }}>Close</Button></section>}
+        <div className="pv-header-end"><Badge tone="accent">Preview</Badge><div ref={profileRef} className="pv-profile-wrap" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setProfileOpen(false) }}><button className="pv-profile" aria-label="Nurul Aisyah, profile" aria-expanded={profileOpen} aria-controls="preview-profile" onClick={() => setProfileOpen(!profileOpen)}><span className="pv-avatar">NA</span><span className="pv-profile-name">Nurul Aisyah<small>Claims assessor</small></span><PreviewIcon icon={CaretDown} /></button>
+          {profileOpen && <section id="preview-profile" className="pv-profile-popover pa-profile" aria-label="Preview profile"><h3>Nurul Aisyah</h3><p>Claims Assessor</p><hr /><Button variant="ghost" onClick={() => { setProfileOpen(false); setAccountNotice(''); setPasswordOpen(true) }}><PreviewIcon icon={Key} />Change password</Button><Button variant="ghost" onClick={() => { try { signOut() } catch { setAccountError('Could not clear the preview session. Please try again.') } }}><PreviewIcon icon={SignOut} />Logout</Button>{accountError && <p className="pa-error" role="alert">{accountError}</p>}</section>}
         </div></div>
       </header>
       <main id="preview-content" tabIndex={-1}><PageContainer>{children}</PageContainer></main>
