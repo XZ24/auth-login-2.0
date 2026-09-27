@@ -6,7 +6,9 @@ import '@fontsource/inter/600.css'
 import '@fontsource/jetbrains-mono/500.css'
 import './preview.css'
 import { PreviewShell } from './PreviewShell'
-import { FoundationPreview } from './FoundationPreview'
+import { WorkspacePage } from './WorkspacePage'
+import { WorkbasketPage } from './WorkbasketPage'
+import { ClaimsPage } from './ClaimsPage'
 
 const routes: Record<string, string> = {
   '/ui-preview/workbasket': 'Workbasket',
@@ -20,7 +22,7 @@ const page = routes[path]
 ReactDOM.createRoot(document.getElementById('preview-root')!).render(
   <React.StrictMode>
     <PreviewShell page={page || 'Page not found'}>
-      {page ? <FoundationPreview page={page} /> : (
+      {page === 'Workbasket' ? <WorkbasketPage /> : page === 'Claims' ? <ClaimsPage /> : page === 'Claim workspace' ? <WorkspacePage /> : (
         <div className="pv-page-heading">
           <h1>Page not found</h1>
           <p>This address is outside the design preview.</p>
